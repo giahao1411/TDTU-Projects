@@ -1,0 +1,66 @@
+// Requirement 4 - temporary fine but don't know if test case has file named "PaymentInformation.txt" or not so I reuse the ArrayList in Req3
+public ArrayList<ConvenientCard> getAdultConvenientCards() 
+{
+    //initiate ArrayList <ConvenientCard> 
+    ArrayList<ConvenientCard> convenientCardlst = new ArrayList<ConvenientCard>();
+
+    //try - catch read file 
+    try
+    {
+        //initiate File and Scanner of the data file
+        File readPayInf = new File("data//PaymentInformation.txt");
+        Scanner readFile = new Scanner(readPayInf);
+        while(readFile.hasNextLine())
+        {
+            String data = readFile.nextLine();
+            String[] splitData = data.split(",");
+
+            //get case IDCard(ConvenientCard)
+            if(splitData.length == 1)
+            {
+                //right case IDCard(ConvenientCard)
+                if(data.length() == 6)
+                {
+                    //try - catch getType() in ConvenientCard for exception CannotCreateCard
+                    try
+                    {
+                        //initiate file IDCard.txt and read it
+                        File readIDCard = new File("data//IDCard.txt");
+                        Scanner readIDC = new Scanner(readIDCard);
+                        while(readIDC.hasNextLine())
+                        {
+                            String idcData = readIDC.nextLine();
+                            String[] splitIDCData = idcData.split(",");
+
+                            if(splitData[0].equals(splitIDCData[0]))
+                            {
+                                IDCard idc = new IDCard(Integer.valueOf(splitIDCData[0]), splitIDCData[1], splitIDCData[2], splitIDCData[3], splitIDCData[4], Integer.valueOf(splitIDCData[5]));
+                                ConvenientCard cc = new ConvenientCard(idc);
+                                String idcType = cc.getType();
+                                if(idcType.equals("Adult"))
+                                {
+                                    convenientCardlst.add(cc);
+                                }
+                            }
+                        }
+                        //close Scanner readIDC
+                        readIDC.close();
+                    }
+                    catch (CannotCreateCard e)
+                    {
+                        System.out.println("Not enough age");
+                    }
+                }
+            }
+        }
+        //close Scanner readFile 
+        readFile.close();
+
+        return convenientCardlst;
+    }
+    catch (FileNotFoundException e)
+    {
+        e.printStackTrace();
+        return convenientCardlst;
+    }
+}
