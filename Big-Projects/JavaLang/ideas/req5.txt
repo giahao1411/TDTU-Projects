@@ -1,0 +1,96 @@
+// Requirement 5 - temporary fine. But if the tester change the PaymentInformation.txt file name will not accomplish it.
+    public ArrayList<IDCard> getCustomersHaveBoth() 
+    {
+        //initiate ArrayList<IDCard> -> return this ArrayList
+        ArrayList<IDCard> idCardList = new ArrayList<IDCard>();
+
+        //initiate ArrayList<IDCard> to compare
+        idcm = new IDCardManagement("data//IDCard.txt");
+        ArrayList<IDCard> IDCS = idcm.getIDCards();
+
+        //initiate ArrayList<ConvenientCard> to check 
+        ArrayList<ConvenientCard> conCardList = new ArrayList<ConvenientCard>();
+        ArrayList<ConvenientCard> conCardListTemp = new ArrayList<ConvenientCard>();
+
+        //try - catch read file
+        try
+        {
+            File readFile = new File("data//PaymentInformation.txt");
+            Scanner readData = new Scanner(readFile);
+            while(readData.hasNextLine())
+            {
+                String data = readData.nextLine();
+                String[] parts = data.split(",");
+
+                if(parts.length == 1)
+                {
+                    if(data.length() == 6)
+                    {
+                        try
+                        {
+                            for(IDCard idc : IDCS)
+                            {
+                                if(idc.getICode() == (Integer.valueOf(parts[0])))
+                                {
+                                    ConvenientCard cc = new ConvenientCard(idc);
+                                    cc.getType();
+                                    conCardListTemp.add(cc);
+                                }
+                            }
+                        }
+                        catch (CannotCreateCard e)
+                        {
+                            System.out.println("Not enough age");
+                        }
+                    }
+                }
+            }
+            //close readData Scanner 
+            readData.close();
+        }
+        catch (FileNotFoundException e)
+        {
+            System.out.println(e);
+        }
+
+        //sort the ArraList<ConvenientCard> by the path of IDCard.txt file 
+        for(IDCard idc : IDCS)
+        {
+            for(ConvenientCard cc : conCardListTemp)
+            {
+                IDCard idCard = cc.getTheDinhDanh();
+                if(idCard.getICode() == idc.getICode())
+                {
+                    conCardList.add(new ConvenientCard(idc));
+                }
+            }
+        }
+
+        //use for - each loop to check if customer have both ConvenientCard, EWallet, BankAccout
+        for(ConvenientCard conCard : conCardList)
+        {
+            IDCard idc = conCard.getTheDinhDanh();
+            int icode = idc.getICode();
+            int phoneNum = idc.getPhoneNum();
+            for(Payment obj : paymentObjects)
+            {
+                if(obj instanceof BankAccount)
+                {
+                    if(icode == ((BankAccount) obj).getSTK())
+                    {
+                        for(Payment obj1 : paymentObjects)
+                        {
+                            if(obj1 instanceof EWallet)
+                            {
+                                if(phoneNum == ((EWallet) obj1).getPhoneNum())
+                                {
+                                    idCardList.add(idc);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return idCardList;
+    }
